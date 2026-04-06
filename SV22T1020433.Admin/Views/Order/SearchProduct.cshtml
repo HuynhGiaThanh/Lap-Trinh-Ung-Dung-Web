@@ -1,0 +1,53 @@
+@using SV22T1020433.Models.Catalog
+@model SV22T1020433.Models.Common.PagedResult<Product>
+@{
+    Layout = null;
+}
+
+@if (Model.DataItems.Count == 0)
+{
+    <div class="text-center text-muted mt-3">Không tìm thấy mặt hàng phù hợp.</div>
+}
+else
+{
+    @foreach (var item in Model.DataItems)
+    {
+        <div class="card mb-2 border-light shadow-sm">
+            <div class="card-body p-2">
+                <form action="~/Order/AddCartItem" method="post" onsubmit="addToCart(arguments[0], this)">
+                    <input type="hidden" name="productId" value="@item.ProductID" />
+                    <div class="row align-items-center">
+                        <div class="col-3">
+                            <img src="~/images/products/@(string.IsNullOrWhiteSpace(item.Photo) ? "noproduct.png" : item.Photo)"
+                                 class="img-fluid rounded" style="max-height: 60px;" />
+                        </div>
+                        <div class="col-9">
+                            <h6 class="mb-1 text-truncate" title="@item.ProductName">@item.ProductName</h6>
+                            <div class="small text-muted mb-2">Giá: <span class="text-danger fw-bold">@item.Price.ToString("N0")</span> / @item.Unit</div>
+                            
+                            <div class="input-group input-group-sm">
+                                <input type="number" name="quantity" value="1" min="1" class="form-control" />
+                                <input type="hidden" name="salePrice" value="@item.Price" />
+                                <button class="btn btn-primary" type="submit">
+                                    <i class="bi bi-cart-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (Model.PageCount > 1)
+    {
+        <ul class="pagination pagination-sm justify-content-center mt-3">
+            @for (int p = 1; p <= Model.PageCount; p++)
+            {
+                <li class="page-item @(p == Model.Page ? "active" : "")">
+                    <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @p)">@p</a>
+                </li>
+            }
+        </ul>
+    }
+}

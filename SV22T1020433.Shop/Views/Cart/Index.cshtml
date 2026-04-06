@@ -1,0 +1,98 @@
+@model IEnumerable<SV22T1020433.Models.Sales.OrderDetailViewInfo>
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    decimal total = 0;
+}
+
+<div class="card shadow-sm mb-5">
+    <div class="card-header bg-white py-3">
+        <h4 class="mb-0 fw-bold text-uppercase"><i class="bi bi-cart3 me-2 text-primary"></i>Giỏ hàng của bạn</h4>
+    </div>
+    <div class="card-body p-0">
+        @if (!Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-cart-x fs-1 text-muted d-block mb-3"></i>
+                <p class="text-muted">Giỏ hàng của bạn hiện đang trống.</p>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-primary mt-3 text-uppercase">Tiếp tục mua sắm</a>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr class="small text-uppercase fw-bold text-muted">
+                            <th class="ps-4">Sản phẩm</th>
+                            <th class="text-center">Đơn giá</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-end">Thành tiền</th>
+                            <th class="text-center pe-4">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            total += item.TotalPrice;
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <img src="~/images/products/@item.Photo" class="rounded me-3" style="width: 60px; height: 60px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">@item.ProductName</h6>
+                                            <span class="small text-muted">ĐVT: @item.Unit</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">@item.SalePrice.ToString("N0") VNĐ</td>
+                                <td class="text-center" style="width: 150px;">
+                                    <div class="input-group input-group-sm px-3">
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(@item.ProductID, @(item.Quantity - 1))">-</button>
+                                        <input type="text" class="form-control text-center" value="@item.Quantity" readonly>
+                                        <button class="btn btn-outline-secondary" type="button" onclick="updateQty(@item.ProductID, @(item.Quantity + 1))">+</button>
+                                    </div>
+                                </td>
+                                <td class="text-end fw-bold">@item.TotalPrice.ToString("N0") VNĐ</td>
+                                <td class="text-center pe-4">
+                                    <a href="~/Cart/Remove/@item.ProductID" class="text-danger fs-5" onclick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?')">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+    @if (Model.Any())
+    {
+        <div class="card-footer bg-light py-4 ps-4 pe-4">
+            <div class="row align-items-center">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-link text-decoration-none p-0">
+                        <i class="bi bi-arrow-left me-2"></i>Tiếp tục mua sắm
+                    </a>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <div class="mb-3">
+                        <span class="text-muted text-uppercase small fw-bold me-3">Tổng cộng:</span>
+                        <span class="text-danger fw-bold fs-3">@total.ToString("N0") VNĐ</span>
+                    </div>
+                    <div class="d-grid d-md-block gap-2">
+                        <a href="~/Cart/Clear" class="btn btn-outline-secondary me-md-2" onclick="return confirm('Xóa sạch giỏ hàng?')">XÓA GIỎ HÀNG</a>
+                        <a asp-controller="Order" asp-action="Checkout" class="btn btn-primary btn-lg px-5">ĐẶT HÀNG NGAY</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        function updateQty(id, qty) {
+            window.location.href = `/Cart/Update?id=${id}&quantity=${qty}`;
+        }
+    </script>
+}

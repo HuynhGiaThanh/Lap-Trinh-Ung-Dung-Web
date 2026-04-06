@@ -1,0 +1,205 @@
+@using SV22T1020433.Models.Sales
+@model SV22T1020433.Models.Sales.Order
+@{
+    ViewBag.Title = "Chi tiết đơn hàng";
+    var orderDetails = ViewBag.Details as List<SV22T1020433.Models.Sales.OrderDetailViewInfo> ?? new List<SV22T1020433.Models.Sales.OrderDetailViewInfo>();
+}
+
+@section PageToolBar {
+    <div class="btn-group">
+        <button type="button"
+                class="btn btn-primary dropdown-toggle"
+                data-bs-toggle="dropdown">
+            <i class="bi bi-gear me-1"></i>
+            Xử lý đơn hàng
+        </button>
+        <ul class="dropdown-menu">
+            @if (Model.Status == OrderStatusEnum.New)
+            {
+                <li>
+                    <a class="dropdown-item" href="~/Order/Accept/@Model.OrderID">Duyệt đơn hàng</a>
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="~/Order/Reject/@Model.OrderID">Từ chối đơn hàng</a>
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="~/Order/Cancel/@Model.OrderID">Hủy đơn hàng</a>
+                </li>
+            }
+            @if (Model.Status == OrderStatusEnum.Accepted)
+            {
+                <li>
+                    <a class="dropdown-item" href="~/Order/Shipping/@Model.OrderID">Chuyển giao hàng</a>
+                </li>
+                <li>
+                    <a class="dropdown-item text-danger" href="~/Order/Cancel/@Model.OrderID">Hủy đơn hàng</a>
+                </li>
+            }
+            @if (Model.Status == OrderStatusEnum.Shipping)
+            {
+                <li>
+                    <a class="dropdown-item" href="~/Order/Finish/@Model.OrderID">Hoàn tất đơn hàng</a>
+                </li>
+            }
+        </ul>
+    </div>
+
+    @if (Model.Status == OrderStatusEnum.Cancelled || Model.Status == OrderStatusEnum.Rejected)
+    {
+        <a href="~/Order/Delete/@Model.OrderID"
+           class="btn btn-danger ms-1">
+            <i class="bi bi-trash"></i>
+            Xóa
+        </a>
+    }
+
+    <a href="~/Order" class="btn btn-secondary ms-1">
+        <i class="bi bi-arrow-left"></i>
+        Quay lại
+    </a>
+}
+
+<!-- TRẠNG THÁI ĐƠN HÀNG -->
+@{
+    string alertClass = Model.Status == OrderStatusEnum.Completed ? "alert-success" :
+                        (Model.Status == OrderStatusEnum.Cancelled || Model.Status == OrderStatusEnum.Rejected) ? "alert-danger" :
+                        "alert-info";
+}
+<div class="alert @alertClass d-flex align-items-center mb-3">
+    <i class="bi bi-info-circle-fill fs-4 me-2"></i>
+    <div>
+        <strong>Trạng thái đơn hàng: @Model.Status.GetDescription()</strong>
+        @if (Model.AcceptTime != null)
+        {
+            <span> | Duyệt lúc: <b>@Model.AcceptTime?.ToString("dd/MM/yyyy HH:mm")</b></span>
+        }
+        @if (Model.ShippedTime != null)
+        {
+            <span> | Giao hàng lúc: <b>@Model.ShippedTime?.ToString("dd/MM/yyyy HH:mm")</b></span>
+        }
+        @if (Model.FinishedTime != null)
+        {
+            <span> | Kết thúc lúc: <b>@Model.FinishedTime?.ToString("dd/MM/yyyy HH:mm")</b></span>
+        }
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <!-- THÔNG TIN ĐƠN HÀNG -->
+        <div class="card card-primary card-outline mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-receipt me-2"></i> Thông tin đơn hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Mã đơn hàng</div>
+                    <div class="col-sm-8">@Model.OrderID</div>
+                </div>
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Ngày lập đơn</div>
+                    <div class="col-sm-8">@Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Nhân viên phụ trách</div>
+                    <div class="col-sm-8">@Model.EmployeeName</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <!-- THÔNG TIN KHÁCH HÀNG -->
+        <div class="card card-info card-outline mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-person me-2"></i> Thông tin khách hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Khách hàng</div>
+                    <div class="col-sm-8">@Model.CustomerName</div>
+                </div>
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Địa chỉ giao hàng</div>
+                    <div class="col-sm-8">@Model.DeliveryAddress</div>
+                </div>
+                <div class="row mb-2 border-bottom pb-2">
+                    <div class="col-sm-4 fw-bold">Tỉnh / Thành</div>
+                    <div class="col-sm-8">@Model.DeliveryProvince</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- THÔNG TIN GIAO HÀNG -->
+        <div class="card card-success card-outline mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-truck me-2"></i> Thông tin giao hàng</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="row mb-2 border-bottom pb-2">
+                            <div class="col-sm-4 fw-bold">Người giao hàng</div>
+                            <div class="col-sm-8">@Model.ShipperName</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="row mb-2 border-bottom pb-2">
+                            <div class="col-sm-4 fw-bold">Điện thoại</div>
+                            <div class="col-sm-8">@Model.ShipperPhone</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DANH SÁCH MẶT HÀNG -->
+<div class="card card-secondary card-outline">
+    <div class="card-header">
+        <h5 class="card-title mb-0"><i class="bi bi-box-seam me-2"></i> Danh sách mặt hàng</h5>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-secondary text-center">
+                <tr>
+                    <th style="width: 50px;">STT</th>
+                    <th>Tên hàng</th>
+                    <th style="width: 100px;">ĐVT</th>
+                    <th style="width: 100px;">Số lượng</th>
+                    <th style="width: 150px;">Giá</th>
+                    <th style="width: 150px;">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = 0;
+                    decimal total = 0;
+                }
+                @foreach (var item in orderDetails)
+                {
+                    stt++;
+                    total += item.TotalPrice;
+                    <tr>
+                        <td class="text-center">@stt</td>
+                        <td>@item.ProductName</td>
+                        <td class="text-center">@item.Unit</td>
+                        <td class="text-center">@item.Quantity</td>
+                        <td class="text-end">@item.SalePrice.ToString("N0")</td>
+                        <td class="text-end fw-bold">@item.TotalPrice.ToString("N0")</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="5" class="text-end">Tổng cộng</th>
+                    <th class="text-end text-danger fs-5">@total.ToString("N0")</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

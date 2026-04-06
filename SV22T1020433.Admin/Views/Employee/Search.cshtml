@@ -1,0 +1,74 @@
+@using SV22T1020433.Models.HR
+@model SV22T1020433.Models.Common.PagedResult<Employee>
+@{
+    Layout = null;
+}
+
+<div class="mb-2 text-muted">
+    Danh sách này có <strong>@Model.RowCount</strong> nhân viên
+</div>
+
+<div class="card">
+    <div class="card-body p-1">
+        <table class="table table-bordered table-hover mb-0">
+            <thead class="table-secondary">
+                <tr>
+                    <th>Họ tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Điện thoại</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th class="text-center" style="width:140px;">Trạng thái</th>
+                    <th class="text-center" style="width:130px;">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.DataItems.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted">Không có nhân viên nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var item in Model.DataItems)
+                    {
+                        <tr>
+                            <td>@item.FullName</td>
+                            <td>@(item.BirthDate?.ToString("dd/MM/yyyy"))</td>
+                            <td>@item.Phone</td>
+                            <td>@item.Email</td>
+                            <td>@item.Address</td>
+                            <td class="text-center">
+                                @if (item.IsWorking == false)
+                                {
+                                    <span class="badge bg-secondary">Đã nghỉ việc</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-success">Đang làm việc</span>
+                                }
+                            </td>
+                            <td class="text-center text-nowrap">
+                                <a href="~/Employee/Edit/@item.EmployeeID" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a href="~/Employee/Delete/@item.EmployeeID" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                                <a href="~/Employee/ChangePassword/@item.EmployeeID" class="btn btn-sm btn-warning ms-2">
+                                    <i class="bi bi-key"></i>
+                                </a>
+                                <a href="~/Employee/ChangeRole/@item.EmployeeID" class="btn btn-sm btn-info">
+                                    <i class="bi bi-shield-check"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @await Html.PartialAsync("_Pager", Model)
+</div>

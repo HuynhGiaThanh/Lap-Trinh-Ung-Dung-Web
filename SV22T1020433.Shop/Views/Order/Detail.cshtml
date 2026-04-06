@@ -1,0 +1,113 @@
+@model SV22T1020433.Models.Sales.OrderViewInfo
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.OrderID;
+    var details = ViewBag.Details as List<OrderDetailViewInfo> ?? new List<OrderDetailViewInfo>();
+    decimal total = details.Sum(m => m.TotalPrice);
+}
+
+<div class="row mt-4">
+    <div class="col-lg-12">
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                <i class="bi bi-check-circle me-2"></i> @TempData["Message"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-uppercase text-primary">Đơn hàng #@Model.OrderID</h5>
+                @{
+                    string badgeClass = Model.Status switch
+                    {
+                        OrderStatusEnum.New => "bg-info",
+                        OrderStatusEnum.Accepted => "bg-primary",
+                        OrderStatusEnum.Shipping => "bg-warning",
+                        OrderStatusEnum.Completed => "bg-success",
+                        OrderStatusEnum.Cancelled => "bg-secondary",
+                        OrderStatusEnum.Rejected => "bg-danger",
+                        _ => "bg-dark"
+                    };
+                }
+                <span class="badge @badgeClass fs-6">@Model.StatusDescription</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-md-4 mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3">Thông tin đơn hàng</h6>
+                        <p class="mb-1"><strong>Ngày đặt:</strong> @Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</p>
+                        @if (Model.AcceptTime.HasValue)
+                        {
+                            <p class="mb-1"><strong>Ngày duyệt:</strong> @Model.AcceptTime.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                        }
+                        @if (Model.ShippedTime.HasValue)
+                        {
+                            <p class="mb-1"><strong>Ngày giao:</strong> @Model.ShippedTime.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                        }
+                        @if (Model.FinishedTime.HasValue)
+                        {
+                            <p class="mb-1"><strong>Kết thúc:</strong> @Model.FinishedTime.Value.ToString("dd/MM/yyyy HH:mm")</p>
+                        }
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3">Thông tin khách hàng</h6>
+                        <p class="mb-1"><strong>Họ tên:</strong> @Model.CustomerName</p>
+                        <p class="mb-1"><strong>Điện thoại:</strong> @Model.CustomerPhone</p>
+                        <p class="mb-1"><strong>Email:</strong> @Model.CustomerEmail</p>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3">Thông tin giao hàng</h6>
+                        <p class="mb-1"><strong>Người giao:</strong> @(string.IsNullOrWhiteSpace(Model.ShipperName) ? "---" : Model.ShipperName)</p>
+                        <p class="mb-1"><strong>Điện thoại:</strong> @(string.IsNullOrWhiteSpace(Model.ShipperPhone) ? "---" : Model.ShipperPhone)</p>
+                        <p class="mb-1"><strong>Địa chỉ:</strong> @Model.DeliveryAddress</p>
+                        <p class="mb-1"><strong>Tỉnh thành:</strong> @Model.DeliveryProvince</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h6 class="text-muted text-uppercase small fw-bold mb-3">Danh sách mặt hàng</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle">
+                        <thead class="bg-light">
+                            <tr class="small text-uppercase fw-bold text-muted">
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th>Sản phẩm</th>
+                                <th class="text-center" style="width: 100px;">ĐVT</th>
+                                <th class="text-center" style="width: 100px;">Số lượng</th>
+                                <th class="text-end" style="width: 150px;">Đơn giá</th>
+                                <th class="text-end" style="width: 150px;">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < details.Count; i++)
+                            {
+                                var item = details[i];
+                                <tr>
+                                    <td class="text-center">@(i + 1)</td>
+                                    <td>@item.ProductName</td>
+                                    <td class="text-center">@item.Unit</td>
+                                    <td class="text-center">@item.Quantity</td>
+                                    <td class="text-end">@item.SalePrice.ToString("N0")</td>
+                                    <td class="text-end fw-bold">@item.TotalPrice.ToString("N0")</td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="5" class="text-end text-uppercase">Tổng cộng:</th>
+                                <th class="text-end text-danger fs-5">@total.ToString("N0") VNĐ</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-white py-3 text-end">
+                <a asp-action="History" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>Quay lại lịch sử
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

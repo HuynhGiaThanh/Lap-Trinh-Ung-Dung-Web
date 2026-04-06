@@ -1,0 +1,93 @@
+@model SV22T1020433.Models.Partner.Customer
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white text-center py-3">
+                <h4 class="mb-0 text-uppercase">Đăng ký tài khoản mới</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-controller="Account" asp-action="Register" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input type="text" asp-for="CustomerName" class="form-control" placeholder="Nguyễn Văn A" required />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên giao dịch</label>
+                            <input type="text" asp-for="ContactName" class="form-control" placeholder="Anh Ba" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Email (Tên đăng nhập)</label>
+                        <input type="email" asp-for="Email" class="form-control" placeholder="example@email.com" required />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Mật khẩu</label>
+                            <input type="password" asp-for="Password" class="form-control" placeholder="********" required />
+                            <span asp-validation-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Xác nhận mật khẩu</label>
+                            <input type="password" name="confirmPassword" class="form-control" placeholder="********" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Điện thoại</label>
+                        <input type="tel" asp-for="Phone" class="form-control" placeholder="0123 456 789" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tỉnh / Thành</label>
+                        <select asp-for="Province" class="form-select" required>
+                            <option value="">-- Chọn Tỉnh / Thành --</option>
+                            @foreach (var p in ViewBag.Provinces as List<Province> ?? new List<Province>())
+                            {
+                                <option value="@p.ProvinceName">@p.ProvinceName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Province" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Địa chỉ</label>
+                        <textarea asp-for="Address" class="form-control" rows="2" placeholder="Số nhà, tên đường..."></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">ĐĂNG KÝ NGAY</button>
+                    </div>
+
+                    <div class="text-danger text-center mb-3 small">
+                        @Html.ValidationSummary(true)
+                    </div>
+
+                    <div class="text-center">
+                        Đã có tài khoản? <a asp-action="Login" class="text-decoration-none">Đăng nhập ngay</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Load Provinces AJAX if needed, or I'll just use a text input for now to avoid complexity in registration
+            // Actually, I'll update the select to a text input if I don't want to deal with AJAX here.
+            // Let's keep it as select and I'll populate it in the controller if needed.
+        });
+    </script>
+}

@@ -1,0 +1,132 @@
+@model SV22T1020433.Models.Common.PagedResult<Product>
+@{
+    ViewData["Title"] = "Danh sách sản phẩm";
+    var input = ViewBag.CurrentInput as ProductSearchInput;
+    var categories = (ViewBag.Categories as PagedResult<Category>)?.DataItems ?? new List<Category>();
+}
+
+<div class="row">
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-uppercase"><i class="bi bi-funnel me-2"></i>Bộ lọc</h6>
+            </div>
+            <div class="card-body">
+                <form action="~/Product/Index" method="get">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Tìm kiếm</label>
+                        <div class="input-group">
+                            <input type="text" name="searchValue" value="@input?.SearchValue" class="form-control" placeholder="Tên sản phẩm...">
+                            <button class="btn btn-primary" type="submit"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Loại hàng</label>
+                        <div class="list-group list-group-flush">
+                            <a href="~/Product/Index?categoryID=0&searchValue=@input?.SearchValue" 
+                               class="list-group-item list-group-item-action @(input?.CategoryID == 0 ? "active" : "") small">
+                                Tất cả loại hàng
+                            </a>
+                            @foreach (var c in categories)
+                            {
+                                <a href="~/Product/Index?categoryID=@c.CategoryID&searchValue=@input?.SearchValue" 
+                                   class="list-group-item list-group-item-action @(input?.CategoryID == c.CategoryID ? "active" : "") small">
+                                    @c.CategoryName
+                                </a>
+                            }
+                        </div>
+                        <input type="hidden" name="categoryID" value="@input?.CategoryID" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Khoảng giá</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <input type="number" name="minPrice" value="@(input?.MinPrice > 0 ? input.MinPrice : "")" class="form-control form-control-sm" placeholder="Từ...">
+                            </div>
+                            <div class="col-6">
+                                <input type="number" name="maxPrice" value="@(input?.MaxPrice > 0 ? input.MaxPrice : "")" class="form-control form-control-sm" placeholder="Đến...">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm">ÁP DỤNG</button>
+                        <a href="~/Product/Index" class="btn btn-outline-secondary btn-sm">XÓA BỘ LỌC</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Có <strong>@Model.RowCount</strong> sản phẩm được tìm thấy</h5>
+            <div class="small text-muted">Trang @Model.Page/@Model.PageCount</div>
+        </div>
+
+        @if (Model.DataItems.Count == 0)
+        {
+            <div class="alert alert-info py-5 text-center">
+                <i class="bi bi-info-circle fs-1 d-block mb-3"></i>
+                Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn.
+            </div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+                @foreach (var item in Model.DataItems)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <div class="position-relative">
+                                <img src="~/images/products/@(string.IsNullOrWhiteSpace(item.Photo) ? "noproduct.png" : item.Photo)" 
+                                     class="card-img-top" alt="@item.ProductName" style="height: 200px; object-fit: cover;">
+                                @if (item.IsSelling)
+                                {
+                                    <span class="badge bg-success position-absolute top-0 end-0 m-2">Đang bán</span>
+                                }
+                            </div>
+                            <div class="card-body">
+                                <h6 class="card-title text-truncate">@item.ProductName</h6>
+                                <p class="card-text text-danger fw-bold fs-5 mb-1">@item.Price.ToString("N0") VNĐ</p>
+                                <p class="small text-muted mb-0">ĐVT: @item.Unit</p>
+                            </div>
+                            <div class="card-footer bg-white border-top-0 pb-3">
+                                <div class="d-grid gap-2">
+                                    <a href="~/Product/Details/@item.ProductID" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-info-circle me-1"></i>Chi tiết
+                                    </a>
+                                    <form action="~/Cart/Add" method="post" class="d-grid">
+                                        <input type="hidden" name="id" value="@item.ProductID" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            <div class="mt-4">
+                @{
+                    var queryParams = new Dictionary<string, string>
+                    {
+                        { "categoryID", input?.CategoryID.ToString() ?? "0" },
+                        { "searchValue", input?.SearchValue ?? "" },
+                        { "minPrice", input?.MinPrice.ToString() ?? "0" },
+                        { "maxPrice", input?.MaxPrice.ToString() ?? "0" }
+                    };
+                }
+                @await Html.PartialAsync("_Pager", Model, new ViewDataDictionary(ViewData) { { "queryParameters", queryParams } })
+            </div>
+        }
+    </div>
+</div>

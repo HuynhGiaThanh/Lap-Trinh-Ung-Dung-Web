@@ -1,0 +1,56 @@
+@model SV22T1020433.Models.Catalog.ProductSearchInput
+@{
+    ViewBag.Title = "Quản lý mặt hàng";
+}
+@section PageToolBar {
+    <a href="~/Product/Create" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i>
+        Bổ sung
+    </a>
+}
+<div class="card mb-3">
+    <div class="card-body">
+        <form id="formSearch"
+              method="get"
+              action="~/Product/Search"
+              data-target="searchResult"
+              onsubmit="paginationSearch(arguments[0], this, 1)">
+
+            <div class="row">
+                <div class="col-sm-3 mb-2">
+                    <label>Loại hàng:</label>
+                    <select class="form-select" asp-for="CategoryID" asp-items="await SelectListHelper.Categories()" onchange="paginationSearch(null, document.getElementById('formSearch'), 1)">
+                    </select>
+                </div>
+                <div class="col-sm-3 mb-2">
+                    <label>Nhà cung cấp:</label>
+                    <select class="form-select" asp-for="SupplierID" asp-items="await SelectListHelper.Suppliers()" onchange="paginationSearch(null, document.getElementById('formSearch'), 1)">
+                    </select>
+                </div>
+                <div class="col-sm-6 mb-2">
+                    <label>Tìm kiếm:</label>
+                    <div class="input-group">
+                        <input type="hidden" asp-for="PageSize" />
+                        <input type="text"
+                               asp-for="SearchValue"
+                               class="form-control"
+                               placeholder="Tên mặt hàng..." autofocus />
+                        <button class="btn btn-info d-flex align-items-center">
+                            <i class="bi bi-search me-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="searchResult"></div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            paginationSearch(null, document.getElementById("formSearch"), @Model.Page);
+        });
+    </script>
+}

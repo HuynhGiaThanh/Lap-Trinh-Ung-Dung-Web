@@ -1,0 +1,70 @@
+@model IEnumerable<SV22T1020433.Models.Catalog.Product>
+@{
+    ViewData["Title"] = "Trang chủ";
+}
+
+<!-- Hero Section -->
+<div class="p-5 mb-4 bg-light rounded-3 shadow-sm" style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);">
+    <div class="container-fluid py-5 text-white text-center">
+        <h1 class="display-4 fw-bold text-uppercase">Chào mừng đến với HGT Shop</h1>
+        <p class="fs-4">Khám phá thế giới mua sắm trực tuyến với hàng ngàn sản phẩm chất lượng, giá cả ưu đãi.</p>
+        <a asp-controller="Product" asp-action="Index" class="btn btn-danger btn-lg px-5 mt-3 fw-bold">MUA SẮM NGAY</a>
+    </div>
+</div>
+
+<!-- Featured Products -->
+<div class="container py-5">
+    <h2 class="text-center mb-5 fw-bold text-uppercase">Sản phẩm mới nhất</h2>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        @foreach (var item in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <img src="~/images/products/@(string.IsNullOrWhiteSpace(item.Photo) ? "noproduct.png" : item.Photo)" 
+                         class="card-img-top" alt="@item.ProductName" style="height: 200px; object-fit: cover;">
+                    <div class="card-body text-center">
+                        <h6 class="card-title text-truncate fw-bold">@item.ProductName</h6>
+                        <p class="card-text text-danger fw-bold mb-0">@item.Price.ToString("N0") VNĐ</p>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 pb-3">
+                        <div class="d-grid">
+                            <a href="~/Product/Details/@item.ProductID" class="btn btn-outline-primary btn-sm">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+    <div class="text-center mt-5">
+        <a asp-controller="Product" asp-action="Index" class="btn btn-link text-decoration-none">Xem tất cả sản phẩm <i class="bi bi-arrow-right"></i></a>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="bg-white py-5 mt-5 shadow-sm">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-truck fs-1 text-primary mb-3"></i>
+                    <h5 class="fw-bold">Giao hàng nhanh chóng</h5>
+                    <p class="text-muted small">Cam kết giao hàng trong vòng 24h đối với khu vực nội thành.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-shield-check fs-1 text-primary mb-3"></i>
+                    <h5 class="fw-bold">Bảo hành uy tín</h5>
+                    <p class="text-muted small">Chính sách bảo hành và đổi trả linh hoạt, bảo vệ quyền lợi khách hàng.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-3">
+                    <i class="bi bi-headset fs-1 text-primary mb-3"></i>
+                    <h5 class="fw-bold">Hỗ trợ 24/7</h5>
+                    <p class="text-muted small">Đội ngũ chăm sóc khách hàng luôn sẵn sàng giải đáp mọi thắc mắc.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

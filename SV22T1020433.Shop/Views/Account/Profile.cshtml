@@ -1,0 +1,90 @@
+@model SV22T1020433.Models.Partner.Customer
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card shadow mb-4">
+            <div class="card-body text-center p-4">
+                <div class="mb-3">
+                    <i class="bi bi-person-circle text-primary" style="font-size: 5rem;"></i>
+                </div>
+                <h4 class="fw-bold">@Model.CustomerName</h4>
+                <p class="text-muted small">@Model.Email</p>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a asp-action="ChangePassword" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-key me-1"></i> Đổi mật khẩu
+                    </a>
+                    <a asp-controller="Order" asp-action="History" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-clock-history me-1"></i> Lịch sử mua hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-uppercase fw-bold text-primary">Cập nhật thông tin cá nhân</h5>
+            </div>
+            <div class="card-body p-4">
+                @if (TempData["Message"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        @TempData["Message"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+
+                <form asp-controller="Account" asp-action="Profile" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CustomerID" />
+                    <input type="hidden" asp-for="Email" />
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Họ và tên</label>
+                            <input type="text" asp-for="CustomerName" class="form-control" required />
+                            <span asp-validation-for="CustomerName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tên giao dịch</label>
+                            <input type="text" asp-for="ContactName" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Điện thoại</label>
+                            <input type="tel" asp-for="Phone" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Tỉnh / Thành</label>
+                            <select asp-for="Province" class="form-select">
+                                <option value="">-- Chọn Tỉnh / Thành --</option>
+                                @foreach (var p in ViewBag.Provinces as List<Province> ?? new List<Province>())
+                                {
+                                    <option value="@p.ProvinceName">@p.ProvinceName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Địa chỉ</label>
+                        <textarea asp-for="Address" class="form-control" rows="2"></textarea>
+                    </div>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary px-4">LƯU THAY ĐỔI</button>
+                    </div>
+
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger small mt-3" })
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,100 @@
+@model SV22T1020433.Models.Sales.Order
+@{
+    ViewData["Title"] = "Thanh toán";
+    var cart = ViewBag.Cart as List<OrderDetailViewInfo> ?? new List<OrderDetailViewInfo>();
+    decimal total = cart.Sum(m => m.TotalPrice);
+}
+
+<div class="row mt-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-uppercase"><i class="bi bi-truck me-2 text-primary"></i>Thông tin giao hàng</h5>
+            </div>
+            <div class="card-body p-4">
+                <form asp-controller="Order" asp-action="InitOrder" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="CustomerID" />
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Tỉnh / Thành phố</label>
+                        <select asp-for="DeliveryProvince" class="form-select" required>
+                            <option value="">-- Chọn Tỉnh / Thành --</option>
+                            @foreach (var p in ViewBag.Provinces as List<Province> ?? new List<Province>())
+                            {
+                                <option value="@p.ProvinceName">@p.ProvinceName</option>
+                            }
+                        </select>
+                        <span asp-validation-for="DeliveryProvince" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted text-uppercase">Địa chỉ nhận hàng</label>
+                        <textarea asp-for="DeliveryAddress" class="form-control" rows="3" placeholder="Số nhà, tên đường, phường/xã..." required></textarea>
+                        <span asp-validation-for="DeliveryAddress" class="text-danger small"></span>
+                    </div>
+
+                    <div class="alert alert-light border small text-muted">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Vui lòng kiểm tra kỹ địa chỉ giao hàng để đảm bảo sản phẩm được gửi đến bạn đúng thời hạn.
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg text-uppercase fw-bold py-3">
+                            Xác nhận đặt hàng
+                        </button>
+                    </div>
+                    
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger mt-3" })
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-uppercase"><i class="bi bi-receipt me-2 text-primary"></i>Tóm tắt đơn hàng</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in cart)
+                    {
+                        <li class="list-group-item py-3">
+                            <div class="d-flex justify-content-between">
+                                <div class="pe-3">
+                                    <h6 class="mb-0 small fw-bold">@item.ProductName</h6>
+                                    <span class="text-muted small">Số lượng: @item.Quantity</span>
+                                </div>
+                                <div class="text-end">
+                                    <span class="small fw-bold">@item.TotalPrice.ToString("N0")</span>
+                                </div>
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
+            <div class="card-footer bg-light p-4">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-muted">Tạm tính:</span>
+                    <span>@total.ToString("N0") VNĐ</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <span class="text-muted">Phí vận chuyển:</span>
+                    <span class="text-success small fw-bold">Miễn phí</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="fw-bold text-uppercase">Tổng cộng:</span>
+                    <span class="text-danger fw-bold fs-4">@total.ToString("N0") VNĐ</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-3">
+            <a asp-controller="Cart" asp-action="Index" class="text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i>Quay lại giỏ hàng
+            </a>
+        </div>
+    </div>
+</div>

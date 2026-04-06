@@ -1,0 +1,51 @@
+@using SV22T1020433.Models.Sales
+@model Order
+@{
+    ViewBag.Title = "Xóa đơn hàng";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <div class="card card-danger card-outline">
+            <div class="card-header">
+                <h5 class="card-title mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Xác nhận xóa đơn hàng
+                </h5>
+            </div>
+
+            <div class="card-body">
+                <div class="alert alert-warning d-flex align-items-center mb-4">
+                    <i class="bi bi-info-circle me-2"></i>
+                    Bạn có chắc chắn muốn xóa đơn hàng <strong>#@Model.OrderID</strong> không? Lưu ý: Hành động này không thể hoàn tác.
+                </div>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Mã đơn hàng</dt>
+                    <dd class="col-sm-9">@Model.OrderID</dd>
+
+                    <dt class="col-sm-3">Ngày lập đơn</dt>
+                    <dd class="col-sm-9">@Model.OrderTime.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                    <dt class="col-sm-3">Khách hàng</dt>
+                    <dd class="col-sm-9">@Model.CustomerName</dd>
+
+                    <dt class="col-sm-3">Trạng thái</dt>
+                    <dd class="col-sm-9">@Model.Status.GetDescription()</dd>
+                </dl>
+            </div>
+
+            <div class="card-footer text-end">
+                <form action="~/Order/Delete/@Model.OrderID" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Xóa đơn hàng
+                    </button>
+                </form>
+                <a href="~/Order/Detail/@Model.OrderID" class="btn btn-secondary ms-1">
+                    Quay lại chi tiết
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
