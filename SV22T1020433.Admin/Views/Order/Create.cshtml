@@ -147,7 +147,7 @@
                 .then(r => r.json())
                 .then(data => {
                     if (data.code === 0) alert(data.message);
-                    else window.location.href = '/Order/Detail/' + data.code;
+                    else window.location.href = '/Order/Detail/' + data.message;
                 });
             return false;
         }

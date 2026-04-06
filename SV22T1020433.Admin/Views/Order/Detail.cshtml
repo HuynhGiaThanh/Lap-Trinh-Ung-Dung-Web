@@ -29,7 +29,7 @@
             @if (Model.Status == OrderStatusEnum.Accepted)
             {
                 <li>
-                    <a class="dropdown-item" href="~/Order/Shipping/@Model.OrderID">Chuyển giao hàng</a>
+                    <a class="dropdown-item open-modal" href="~/Order/Shipping/@Model.OrderID">Chuyển giao hàng</a>
                 </li>
                 <li>
                     <a class="dropdown-item text-danger" href="~/Order/Cancel/@Model.OrderID">Hủy đơn hàng</a>

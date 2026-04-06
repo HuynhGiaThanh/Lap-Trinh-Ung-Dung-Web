@@ -42,12 +42,50 @@ else
     @if (Model.PageCount > 1)
     {
         <ul class="pagination pagination-sm justify-content-center mt-3">
-            @for (int p = 1; p <= Model.PageCount; p++)
-            {
-                <li class="page-item @(p == Model.Page ? "active" : "")">
-                    <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @p)">@p</a>
-                </li>
+            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), 1)">
+                    <i class="bi bi-chevron-double-left"></i>
+                </a>
+            </li>
+            <li class="page-item @(Model.Page == 1 ? "disabled" : "")">
+                <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @(Model.Page - 1))">
+                    <i class="bi bi-chevron-left"></i>
+                </a>
+            </li>
+
+            @{
+                int delta = 2;
+                int start = Math.Max(1, Model.Page - delta);
+                int end = Math.Min(Model.PageCount, Model.Page + delta);
+
+                if (start > 1)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
+
+                for (int p = start; p <= end; p++)
+                {
+                    <li class="page-item @(p == Model.Page ? "active" : "")">
+                        <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @p)">@p</a>
+                    </li>
+                }
+
+                if (end < Model.PageCount)
+                {
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                }
             }
+
+            <li class="page-item @(Model.Page == Model.PageCount ? "disabled" : "")">
+                <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @(Model.Page + 1))">
+                    <i class="bi bi-chevron-right"></i>
+                </a>
+            </li>
+            <li class="page-item @(Model.Page == Model.PageCount ? "disabled" : "")">
+                <a class="page-link" href="javascript:;" onclick="paginationSearch(null, document.getElementById('formSearch'), @Model.PageCount)">
+                    <i class="bi bi-chevron-double-right"></i>
+                </a>
+            </li>
         </ul>
     }
 }
